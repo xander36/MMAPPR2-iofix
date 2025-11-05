@@ -269,8 +269,8 @@ tempOutputFolder <- function() {
 
     outData[[seqname]] <- data.frame(
       seqname = seqname,
-      start   = peak$start,
-      end     = peak$end,
+      start   = as.integer(peak$start),
+      end     = as.integer(peak$end),
       peakPosition        = as.integer(round(peak_pos)),
       densityApexPosition = as.integer(round(density_apex_pos)),
       densityApexScore    = density_apex_val,
