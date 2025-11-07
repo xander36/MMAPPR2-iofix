@@ -55,7 +55,37 @@ generateCandidates <- function(md) {
   # get GRanges representation of peak
   .messageAndLog("Getting Variants in Peak", outputFolder(param(md)))
   peakGRanges <- lapply(md@peaks, .getPeakRange)
+
+  .messageAndLog("Peak report generation", outputFolder(param(md)))
+
+  #Write peak info to log
+  .messageAndLog("Peak Summary:", outputFolder(param(md)))
   
+  for (seqname in names(md@peaks)){
+    peak <- md@peaks[[seqname]]
+    peak_pos <- peak$peakPosition
+
+    density_apex_pos <- NA
+    density_apex_val <- NA
+    if (!is.null(peak$densityData) && all(c("x","y") %in% names(peak$densityData))) {
+      max_index <- which.max(peak$densityData$y)
+      density_apex_pos = peak$densityData$x[max_index]
+      density_apex_val = peak$densityData$y[max_index]
+    }
+
+    log_text <- paste0(
+      "seqname: ", seqname, "\n",
+      "start-end positions:\n",
+      as.integer(peak$start), "-", as.integer(peak$end), "\n",
+      "Position of curve peak: ", as.integer(round(peak_pos)), "\n",
+      "Position of maximum density: ", as.integer(round(density_apex_pos)), "\n",
+      "Value of maximum density: ", density_apex_val, "\n\n"
+    )
+
+    .messageAndLog(log_text, outputFolder(param(md)))
+  }
+  
+
   # call variants in peaks
   md@candidates$snps <- lapply(peakGRanges, FUN = .getVariantsForRange, param = md@param)
   

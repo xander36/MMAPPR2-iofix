@@ -54,7 +54,6 @@ outputMmapprData <- function(mmapprData) {
                           outputFolder(param(mmapprData)))
   }
   
-  .writePeakReport(mmapprData, outputFolder(param(mmapprData)))
   invisible(1)
 }
 
@@ -250,34 +249,4 @@ tempOutputFolder <- function() {
                 file = file.path(outputFolder, filename), 
                 sep = '\t', quote = FALSE, row.names = FALSE)
   }
-}
-
-.writePeakReport <- function(mmapprData, outputFolder){
-  outData <- list()
-  for (seqname in names(mmapprData@peaks)){
-
-    peak <- mmapprData@peaks[[seqname]]
-    peak_pos <- peak$peakPosition
-
-    density_apex_pos <- NA
-    density_apex_val <- NA
-    if (!is.null(peak$densityData) && all(c("x","y") %in% names(peak$densityData))) {
-      max_index <- which.max(peak$densityData$y)
-      density_apex_pos = peak$densityData$x[max_index]
-      density_apex_val = peak$densityData$y[max_index]
-    }
-
-    outData[[seqname]] <- data.frame(
-      seqname = seqname,
-      start   = as.integer(peak$start),
-      end     = as.integer(peak$end),
-      peakPosition        = as.integer(round(peak_pos)),
-      densityApexPosition = as.integer(round(density_apex_pos)),
-      densityApexScore    = density_apex_val,
-      stringsAsFactors = FALSE)
-  }
-  out <- do.call(rbind, outData)
-  write.table(out,
-              file = file.path(outputFolder, "PeaksReport.tsv"),
-              sep = "\t", quote = FALSE, row.names = FALSE)
 }
